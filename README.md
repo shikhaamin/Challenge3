@@ -42,10 +42,4 @@ The Pydantic schemas are defined in `schemas.py`, and the SQLAlchemy models are 
 - The API currently implements only basic CRUD and does not include authentication.
 - Additional endpoints (update, delete, user-specific queries) can be added as needed.
 
----
 
-Feel free to modify the schema or add business logic for your hackathon frontend.
-=======
-# Challenge3
-Hack(H)er413
-ca1e941baadd86f9c0de558342fabef7c1ece2b9
