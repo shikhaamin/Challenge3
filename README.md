@@ -1,3 +1,4 @@
+
 # Hackathon Backend API
 
 This repository contains a basic FastAPI backend that connects to a SQL database with two main tables:
@@ -44,3 +45,7 @@ The Pydantic schemas are defined in `schemas.py`, and the SQLAlchemy models are 
 ---
 
 Feel free to modify the schema or add business logic for your hackathon frontend.
+=======
+# Challenge3
+Hack(H)er413
+ca1e941baadd86f9c0de558342fabef7c1ece2b9
