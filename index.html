@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Task Calendar</title>
+
+    <!-- FullCalendar CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { text-align:center; }
+
+        /* Layout */
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        #employeeSidebar, #taskSidebar {
+            width: 220px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        #calendar {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        h3 { margin-top: 0; }
+
+        .employee {
+            padding: 8px;
+            margin-bottom: 8px;
+            background: #e8f0fe;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Task Sidebar */
+        #todayTasks li {
+            padding: 6px;
+            margin-bottom: 4px;
+            background: #fce8e6;
+            border-radius: 5px;
+            cursor: grab;
+        }
+
+        /* Add Task Button */
+        .add-btn {
+            display: block;
+            margin: 10px auto 20px auto;
+            padding: 10px 20px;
+            background: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover { background: #3367d6; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset:0;
+            background: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .add-btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+        }
+
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 10px;
+            background: #34A853;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover { background: #2c8c46; }
+
+        .close { text-align:right; cursor:pointer; color: gray; font-size:14px; }
+    </style>
+</head>
+<body>
+
+<h1>Team Task Calendar</h1>
+
+<button class="add-btn" onclick="openAddTaskModal()">+ Add Task</button>
+
+<div class="container">
+    <!-- Employee Sidebar -->
+    <div id="employeeSidebar">
+        <h3>Employees</h3>
+        <div id="employees">
+            <!-- Populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div id="calendar"></div>
+
+    <!-- Today's Tasks -->
+    <div id="taskSidebar">
+        <h3>Today's Tasks</h3>
+        <ul id="todayTasks">
+            <!-- Populated dynamically -->
+        </ul>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal" id="addTaskModal">
+    <div class="modal-content">
+        <div class="close" onclick="closeAddTaskModal()">✖ Close</div>
+        <h3>Add Task</h3>
+        <input type="text" id="taskTitle" placeholder="Task Title">
+        <label>Start:</label>
+        <input type="datetime-local" id="taskStart">
+        <label>End:</label>
+        <input type="datetime-local" id="taskEnd">
+        <label>Assign to:</label>
+        <select id="assignedTo"></select>
+        <button onclick="submitTask()">Add Task</button>
+    </div>
+</div>
+
+<script>
+    //check login session first--
+    document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/check_session'); // backend endpoint
+    if (!res.ok) {
+        window.location.href = '/login.html';
+    }
+    // If OK, continue loading calendar...
+});
+//exisitng calendar code
+let calendar;
+//----Mock Data (for front-end testing) ---
+//let mockEmployees = [
+    //{id:1, name:"Alice"}, 
+    //{id:2, name:"Bob"}, 
+    //{id:3, name:"Charlie"}
+//];
+
+//let mockTasks = [
+    //{id:1, title:"Finish report", start:"2026-02-21T09:00:00", end:"2026-02-21T11:00:00", assigned:1},
+    //{id:2, title:"Call client", start:"2026-02-21T12:00:00", end:"2026-02-21T13:00:00", assigned:2}
+//];
+
+//----
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize FullCalendar
+    calendar = new FullCalendar.Calendar(
+        document.getElementById('calendar'), {
+        initialView: 'dayGridMonth',
+        selectable: true,
+        editable: true,
+        events: '/get_tasks',  // Backend returns JSON events
+        select: function(info) {
+            openAddTaskModal(info.startStr, info.endStr);
+        },
+        eventDrop: function(info) {
+            // Dragging event to new date
+            fetch('/update_task', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({id: info.event.id, start: info.event.startStr, end: info.event.endStr})
+            }).then(()=> loadTasks());
+        }
+    });
+    calendar.render();
+
+    loadEmployees();
+    loadTasks();
+});
+
+// Load employees from backend
+function loadEmployees(){
+    fetch('/get_employees')
+    .then(res=>res.json())
+    .then(data=>{
+        const container = document.getElementById('employees');
+        const select = document.getElementById('assignedTo');
+        container.innerHTML = '';
+        select.innerHTML = '';
+        mockEmployees.forEach(emp=>{
+            //Employee box on sidebar
+            const div = document.createElement('div');
+            div.className = 'employee';
+            div.setAttribute('data-id', emp.id);
+            div.textContent = emp.name;
+            div.ondragover = ev => ev.preventDefault();
+            div.ondrop = dropTask;
+            container.appendChild(div);
+
+            // Add to modal dropdown
+            const option = document.createElement('option');
+            option.value = emp.id;
+            option.textContent = emp.name;
+            sel.appendChild(option);
+        });
+    });
+}
+
+// Load today's tasks
+function loadTasks(){
+    const today = new Date().toISOString().slice(0,10);
+    const container = document.getElementById('todayTasks');
+    container.innerHTML = '';
+
+    mockTasks.filter(t=>t.start.slice(0,10)===today).forEach(task=>{
+        const li = document.createElement('li');
+        const emp = mockEmployees.find(e => e.id === task.assigned);
+        li.textContent = `${task.title} - ${emp.name}`;
+        li.draggable = true;
+        li.ondragstart = e => e.dataTransfer.setData('text', task.id);
+        container.appendChild(li);
+    });
+}
+
+// Drag and drop tasks to employees
+function dropTask(ev){
+    ev.preventDefault();
+    const taskId = ev.dataTransfer.getData('text');
+    const employeeId = ev.target.getAttribute('data-id');
+    const task = mockTasks.find(t=>t.id===taskId);
+    task.assigned = employeeId;
+    //Update calendar
+    const event = calendar.getEventById(task.id.toString());
+    const emp = mockEmployees.find(e=>e.id===employeeId);
+    event.setProp('title', `${task.title} - ${emp.name}`);
+    loadTasks();
+}
+
+// Modal functions
+function openAddTaskModal(start='', end=''){
+    document.getElementById('addTaskModal').style.display='flex';
+    document.getElementById('taskStart').value = start;
+    document.getElementById('taskEnd').value = end;
+}
+function closeAddTaskModal(){ document.getElementById('addTaskModal').style.display='none'; }
+
+// Submit task
+function submitTask(){
+    const title = document.getElementById('taskTitle').value;
+    const start = document.getElementById('taskStart').value;
+    const end = document.getElementById('taskEnd').value;
+    const assigned = document.getElementById('assignedTo').value;
+
+    if(!title || !start || !end || !assigned){ alert('Fill all fields'); return; }
+
+
+    //---mthod to connect to backend
+    fetch('/add_task', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({title, start, end, assigned})
+    }).then(()=> {
+        closeAddTaskModal();
+        calendar.refetchEvents();
+        loadTasks();
+    });
+    
+
+
+}
+</script>
+</body>
+</html>
