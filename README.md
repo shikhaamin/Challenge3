@@ -1,4 +1,19 @@
 
+# Overall Project Description:
+- This project is a centralized platform designed to track team availability in real time and provide intelligent task reassignment suggestions to keep projects on schedule.
+
+The current code implements the backend API layer in Python, which:
+
+Exposes endpoints to retrieve team member information, task details, and availability status.
+
+Calculates workload and identifies overloaded users.
+
+Suggests potential task reassignments based on availability and capacity.
+
+At this stage, the API uses mock data to simulate database responses, allowing the frontend to interact with realistic data structures and test the reassignment logic. Integration with the SQL database and real-time calendar data will be added in the next development phase.
+
+
+
 # Hackathon Backend API
 
 This repository contains a basic FastAPI backend that connects to a SQL database with two main tables:
