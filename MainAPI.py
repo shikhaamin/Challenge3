@@ -56,3 +56,12 @@ def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
 @app.get("/tasks/", response_model=List[schemas.Task])
 def read_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_tasks(db, skip=skip, limit=limit)
+
+#--- all data ---
+@app.get("/all_data/")
+def read_all_data(db: Session = Depends(get_db)):
+    return {
+        "users": crud.get_users(db),
+        "availabilities": crud.get_availabilities(db),
+        "tasks": crud.get_tasks(db)
+    }
