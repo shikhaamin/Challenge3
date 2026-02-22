@@ -15,12 +15,15 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: #f4f6f9;
+            background-image: url("dolphins.jpg");
+            background-size: cover;
             margin: 0;
             padding: 20px;
         }
 
         h1 { text-align:center; }
+
+        
 
         /* Layout */
         .container {
@@ -30,7 +33,7 @@
 
         #employeeSidebar, #taskSidebar {
             width: 220px;
-            background: white;
+            background: #FDE992;
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
@@ -38,7 +41,8 @@
 
         #calendar {
             flex: 1;
-            background: white;
+            background-image:url("ocean.jpg");
+            background-size:cover;
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
@@ -49,7 +53,7 @@
         .employee {
             padding: 8px;
             margin-bottom: 8px;
-            background: #e8f0fe;
+            background: #ffcee9;
             border-radius: 6px;
             cursor: pointer;
         }
@@ -58,7 +62,7 @@
         #todayTasks li {
             padding: 6px;
             margin-bottom: 4px;
-            background: #fce8e6;
+            background: #FDE992;
             border-radius: 5px;
             cursor: grab;
         }
@@ -68,14 +72,14 @@
             display: block;
             margin: 10px auto 20px auto;
             padding: 10px 20px;
-            background: #4285F4;
-            color: white;
+            background: #ffffff;
+            color: #000000;
             border: none;
             border-radius: 8px;
             cursor: pointer;
         }
 
-        .add-btn:hover { background: #3367d6; }
+        .add-btn:hover { background: #ffabea; }
 
         /* Modal */
         .modal {
@@ -94,7 +98,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: #FDE992;
             padding: 20px;
             border-radius: 12px;
             width: 300px;
@@ -111,16 +115,16 @@
         .modal-content button {
             width: 100%;
             padding: 10px;
-            background: #34A853;
-            color: white;
+            background: #ffabea;
+            color: #FDE992;
             border: none;
             border-radius: 6px;
             cursor: pointer;
         }
 
-        .modal-content button:hover { background: #2c8c46; }
+        .modal-content button:hover { background: #ffabea; }
 
-        .close { text-align:right; cursor:pointer; color: gray; font-size:14px; }
+        .close { text-align:right; cursor:pointer; color: rgb(255, 176, 234); font-size:14px; }
     </style>
 </head>
 <body>
