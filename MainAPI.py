@@ -5,6 +5,35 @@ from typing import List
 import models, schemas, crud
 from database import engine, Base, get_db
 
+"""
+FastAPI API Endpoints
+
+Base URL (on local network): http://172.31.44.155:8001
+
+Endpoints:
+
+# Users
+GET /users/          -> List all users (JSON)
+GET /users/{user_id} -> Get details of a single user by ID
+POST /users/         -> Create a new user
+
+# Tasks
+GET /tasks/          -> List all tasks (JSON)
+POST /tasks/         -> Create a new task
+
+# Availabilities
+GET /availabilities/ -> List all availabilities (JSON)
+POST /availabilities/ -> Create a new availability
+
+# Combined data (optional)
+GET /all_data/       -> Returns all users, tasks, and availabilities in a single JSON object
+
+Usage:
+- Replace {user_id} with the desired ID
+- Access via Python requests, Postman, or any HTTP client
+- Server must be running and reachable on port 8001
+"""
+
 # create the database tables
 Base.metadata.create_all(bind=engine)
 
